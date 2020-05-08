@@ -2,6 +2,7 @@ package com.cleanup.todoc.model;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+import android.graphics.Color;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -31,6 +32,7 @@ public class Project {
     @ColorInt
     private final int color;
 
+
     /**
      * Instantiates a new Project.
      *
@@ -38,7 +40,7 @@ public class Project {
      * @param name  the name of the project to set
      * @param color the hex (ARGB) code of the color associated to the project to set
      */
-    private Project(long id, @NonNull String name, @ColorInt int color) {
+    public Project(long id, @NonNull String name, @ColorInt int color) {
         this.id = id;
         this.name = name;
         this.color = color;
@@ -108,4 +110,5 @@ public class Project {
     public String toString() {
         return getName();
     }
+
 }

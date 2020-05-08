@@ -42,6 +42,14 @@ public class Task {
      */
     private long creationTimestamp;
 
+    public long getProjectId() {
+        return projectId;
+    }
+
+    public long getCreationTimestamp() {
+        return creationTimestamp;
+    }
+
     /**
      * Instantiates a new Task.
      *
