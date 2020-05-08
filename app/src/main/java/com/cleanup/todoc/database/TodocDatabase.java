@@ -10,6 +10,8 @@ import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 
+import com.cleanup.todoc.database.dao.ProjectDao;
+import com.cleanup.todoc.database.dao.TaskDao;
 import com.cleanup.todoc.model.Project;
 import com.cleanup.todoc.model.Task;
 
@@ -23,6 +25,11 @@ import java.util.Random;
 public abstract class TodocDatabase extends RoomDatabase {
 
     private static volatile TodocDatabase INSTANCE;
+
+    // --- DAO ---
+    public abstract ProjectDao projetDao();
+
+    public abstract TaskDao taskDao();
 
     // --- INSTANCE ---
     public static TodocDatabase getInstance(Context context) {
@@ -48,12 +55,14 @@ public abstract class TodocDatabase extends RoomDatabase {
                 Random rnd = new Random();
                 int color1 = Color.argb(255, rnd.nextInt(256 - 0), rnd.nextInt(256 - 0), rnd.nextInt(256 - 0));
 
-                ContentValues contentValues = new ContentValues();
-                contentValues.put("id", 1);
-                contentValues.put("name", "Project test");
-                contentValues.put("color", color1);
+                //TODO prepeupler la bd
 
-                db.insert("Project", OnConflictStrategy.IGNORE, contentValues);
+                ContentValues projectTartampion = new ContentValues();
+                projectTartampion.put("id", 1);
+                projectTartampion.put("name", "Project test");
+                projectTartampion.put("color", color1);
+
+                db.insert("Project", OnConflictStrategy.IGNORE, projectTartampion);
             }
         };
     }
