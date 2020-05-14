@@ -37,6 +37,8 @@ import java.util.List;
  * @author Gaëtan HERFRAY
  */
 public class MainActivity extends AppCompatActivity implements TasksAdapter.DeleteTaskListener {
+
+    TodocDatabase mDatabase = TodocDatabase.getInstance(this);
     /**
      * List of all projects available in the application
      */
@@ -51,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
     /**
      * The adapter which handles the list of tasks
      */
-    private final TasksAdapter adapter = new TasksAdapter(tasks, this);
+    private final TasksAdapter adapter = new TasksAdapter(tasks, this,mDatabase);
 
     /**
      * The sort method to be used to display tasks
@@ -177,7 +179,6 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
             else if (taskProject != null) {
                 // TODO: Replace this by id of persisted task
                 long id = (long) (Math.random() * 50000);
-
 
                 Task task = new Task(
                         id,
@@ -305,10 +306,9 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
         final Observer<List<Project>> projectObserver = new Observer<List<Project>>() {
             @Override
             public void onChanged(@Nullable final List<Project> projectList) {
-                //TODO change list on array
+                final ArrayAdapter<Project> adapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_spinner_item,projectList);
+              adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-                final ArrayAdapter<Project> adapter = new ArrayAdapter<Project>(this, android.R.layout.simple_spinner_item, projectList);
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 if (dialogSpinner != null) {
                     dialogSpinner.setAdapter(adapter);
                 }

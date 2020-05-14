@@ -1,5 +1,8 @@
 package com.cleanup.todoc.ui;
 
+import android.app.Activity;
+import android.app.Application;
+import android.content.Context;
 import android.content.res.ColorStateList;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.AppCompatImageView;
@@ -10,6 +13,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.cleanup.todoc.R;
+import com.cleanup.todoc.database.TodocDatabase;
+import com.cleanup.todoc.database.dao.ProjectDao;
+import com.cleanup.todoc.database.dao.TaskDao;
 import com.cleanup.todoc.model.Project;
 import com.cleanup.todoc.model.Task;
 
@@ -21,6 +27,11 @@ import java.util.List;
  * @author Gaëtan HERFRAY
  */
 public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHolder> {
+
+    TodocDatabase mDatabase;
+    ProjectDao mProjectDao;
+    TaskDao mTaskDao;
+
     /**
      * The list of tasks the adapter deals with
      */
@@ -38,9 +49,10 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
      *
      * @param tasks the list of tasks the adapter deals with to set
      */
-    TasksAdapter(@NonNull final List<Task> tasks, @NonNull final DeleteTaskListener deleteTaskListener) {
+    TasksAdapter(@NonNull final List<Task> tasks, @NonNull final DeleteTaskListener deleteTaskListener, TodocDatabase db) {
         this.tasks = tasks;
         this.deleteTaskListener = deleteTaskListener;
+        this.mDatabase = db;
     }
 
     /**

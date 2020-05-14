@@ -56,13 +56,26 @@ public abstract class TodocDatabase extends RoomDatabase {
                 int color1 = Color.argb(255, rnd.nextInt(256 - 0), rnd.nextInt(256 - 0), rnd.nextInt(256 - 0));
 
                 //TODO prepeupler la bd
-
                 ContentValues projectTartampion = new ContentValues();
                 projectTartampion.put("id", 1);
-                projectTartampion.put("name", "Project test");
+                projectTartampion.put("name", "Projet Tartampion");
                 projectTartampion.put("color", color1);
 
+                ContentValues projectLucidia = new ContentValues();
+                projectLucidia.put("id", 2);
+                projectLucidia.put("name", "Projet Lucidia");
+                projectLucidia.put("color", color1);
+
+                ContentValues projectCircus = new ContentValues();
+                projectCircus.put("id", 3);
+                projectCircus.put("name", "Projet Circus");
+                projectCircus.put("color", color1);
+
+
+
                 db.insert("Project", OnConflictStrategy.IGNORE, projectTartampion);
+                db.insert("Project", OnConflictStrategy.IGNORE, projectLucidia);
+                db.insert("Project", OnConflictStrategy.IGNORE, projectCircus);
             }
         };
     }
