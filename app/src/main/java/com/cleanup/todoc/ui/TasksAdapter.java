@@ -2,6 +2,7 @@ package com.cleanup.todoc.ui;
 
 import android.app.Activity;
 import android.app.Application;
+import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.support.annotation.NonNull;
@@ -161,7 +162,9 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
             lblTaskName.setText(task.getName());
             imgDelete.setTag(task);
 
-            final Project taskProject = task.getProject();
+           /* final long projectId = mDatabase.taskDao().getProjectId(task.getId());*/
+            final Project taskProject = mDatabase.projetDao().getProject(task.getProjectId());
+
             if (taskProject != null) {
                 imgProject.setSupportImageTintList(ColorStateList.valueOf(taskProject.getColor()));
                 lblProjectName.setText(taskProject.getName());
@@ -169,6 +172,8 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
                 imgProject.setVisibility(View.INVISIBLE);
                 lblProjectName.setText("");
             }
+
+
 
         }
     }

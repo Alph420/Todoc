@@ -36,9 +36,10 @@ public abstract class TodocDatabase extends RoomDatabase {
         if (INSTANCE == null) {
             synchronized (TodocDatabase.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
+                    INSTANCE = Room.databaseBuilder(context,
                             TodocDatabase.class, "MyDatabase.db")
                             .addCallback(prepopulateDatabase())
+                            .allowMainThreadQueries()
                             .build();
                 }
             }
@@ -54,6 +55,8 @@ public abstract class TodocDatabase extends RoomDatabase {
                 super.onCreate(db);
                 Random rnd = new Random();
                 int color1 = Color.argb(255, rnd.nextInt(256 - 0), rnd.nextInt(256 - 0), rnd.nextInt(256 - 0));
+                int color2 = Color.argb(255, rnd.nextInt(256 - 0), rnd.nextInt(256 - 0), rnd.nextInt(256 - 0));
+                int color3 = Color.argb(255, rnd.nextInt(256 - 0), rnd.nextInt(256 - 0), rnd.nextInt(256 - 0));
 
                 //TODO prepeupler la bd
                 ContentValues projectTartampion = new ContentValues();
@@ -64,13 +67,12 @@ public abstract class TodocDatabase extends RoomDatabase {
                 ContentValues projectLucidia = new ContentValues();
                 projectLucidia.put("id", 2);
                 projectLucidia.put("name", "Projet Lucidia");
-                projectLucidia.put("color", color1);
+                projectLucidia.put("color", color2);
 
                 ContentValues projectCircus = new ContentValues();
                 projectCircus.put("id", 3);
                 projectCircus.put("name", "Projet Circus");
-                projectCircus.put("color", color1);
-
+                projectCircus.put("color", color3);
 
 
                 db.insert("Project", OnConflictStrategy.IGNORE, projectTartampion);
