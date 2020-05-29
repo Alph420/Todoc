@@ -1,11 +1,8 @@
-package com.cleanup.todoc.ui;
+package com.cleanup.todoc.view;
 
-import android.app.Activity;
-import android.app.Application;
-import android.arch.lifecycle.LiveData;
-import android.content.Context;
 import android.content.res.ColorStateList;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -15,8 +12,6 @@ import android.widget.TextView;
 
 import com.cleanup.todoc.R;
 import com.cleanup.todoc.database.TodocDatabase;
-import com.cleanup.todoc.database.dao.ProjectDao;
-import com.cleanup.todoc.database.dao.TaskDao;
 import com.cleanup.todoc.model.Project;
 import com.cleanup.todoc.model.Task;
 
@@ -30,14 +25,13 @@ import java.util.List;
 public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHolder> {
 
     TodocDatabase mDatabase;
-    ProjectDao mProjectDao;
-    TaskDao mTaskDao;
 
     /**
      * The list of tasks the adapter deals with
      */
     @NonNull
     private List<Task> tasks;
+    private List<Project> projects;
 
     /**
      * The listener for when a task needs to be deleted
@@ -59,10 +53,12 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
     /**
      * Updates the list of tasks the adapter deals with.
      *
-     * @param tasks the list of tasks the adapter deals with to set
+     * @param tasks    the list of tasks the adapter deals with to set
+     * @param projects
      */
-    void updateTasks(@NonNull final List<Task> tasks) {
+    void updateTasks(@NonNull final List<Task> tasks, List<Project> projects) {
         this.tasks = tasks;
+        this.projects = projects;
         notifyDataSetChanged();
     }
 
@@ -129,7 +125,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
         /**
          * Instantiates a new TaskViewHolder.
          *
-         * @param itemView the view of the task item
+         * @param itemView           the view of the task item
          * @param deleteTaskListener the listener for when a task needs to be deleted to set
          */
         TaskViewHolder(@NonNull View itemView, @NonNull DeleteTaskListener deleteTaskListener) {
@@ -142,13 +138,10 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
             lblProjectName = itemView.findViewById(R.id.lbl_project_name);
             imgDelete = itemView.findViewById(R.id.img_delete);
 
-            imgDelete.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    final Object tag = view.getTag();
-                    if (tag instanceof Task) {
-                        TaskViewHolder.this.deleteTaskListener.onDeleteTask((Task) tag);
-                    }
+            imgDelete.setOnClickListener(view -> {
+                final Object tag = view.getTag();
+                if (tag instanceof Task) {
+                    TaskViewHolder.this.deleteTaskListener.onDeleteTask((Task) tag);
                 }
             });
         }
@@ -162,8 +155,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
             lblTaskName.setText(task.getName());
             imgDelete.setTag(task);
 
-           /* final long projectId = mDatabase.taskDao().getProjectId(task.getId());*/
-            final Project taskProject = mDatabase.projetDao().getProject(task.getProjectId());
+            final Project taskProject = getProjectById(task.getProjectId());
 
             if (taskProject != null) {
                 imgProject.setSupportImageTintList(ColorStateList.valueOf(taskProject.getColor()));
@@ -172,9 +164,15 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
                 imgProject.setVisibility(View.INVISIBLE);
                 lblProjectName.setText("");
             }
+        }
 
-
-
+        @Nullable
+        public Project getProjectById(long id) {
+            for (Project project : projects) {
+                if (project.getId() == id)
+                    return project;
+            }
+            return null;
         }
     }
 }

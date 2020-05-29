@@ -1,7 +1,7 @@
-package com.cleanup.todoc.ui;
+package com.cleanup.todoc.view;
 
-import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -20,9 +20,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.cleanup.todoc.R;
+import com.cleanup.todoc.viewModel.MainViewModel;
 import com.cleanup.todoc.database.TodocDatabase;
 import com.cleanup.todoc.database.dao.ProjectDao;
 import com.cleanup.todoc.database.dao.TaskDao;
+import com.cleanup.todoc.viewModel.Injection;
+import com.cleanup.todoc.viewModel.ViewModelFactory;
 import com.cleanup.todoc.model.Project;
 import com.cleanup.todoc.model.Task;
 
@@ -42,12 +45,15 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
     TodocDatabase mDataBase;
     ProjectDao mProjectDao;
     TaskDao mTaskDao;
+    MainViewModel mMainViewModel;
 
     /**
      * List of all current tasks of the application
      */
     @NonNull
     private List<Task> tasks = new ArrayList<>();
+
+    private List<Project> projects = new ArrayList<>();
 
     /**
      * The adapter which handles the list of tasks
@@ -103,27 +109,23 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
         mProjectDao = mDataBase.projetDao();
         mTaskDao = mDataBase.taskDao();
 
-
-        populateList();
-
-
-        adapter = new TasksAdapter(tasks, this, mDataBase);
-
+        this.configureViewModel();
+        this.init();
 
         setContentView(R.layout.activity_main);
 
         listTasks = findViewById(R.id.list_tasks);
         lblNoTasks = findViewById(R.id.lbl_no_task);
-
         listTasks.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         listTasks.setAdapter(adapter);
 
-        findViewById(R.id.fab_add_task).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showAddTaskDialog();
-            }
-        });
+        findViewById(R.id.fab_add_task).setOnClickListener(view -> showAddTaskDialog());
+    }
+
+    public void init() {
+        populateList();
+        projectObservers();
+        adapter = new TasksAdapter(tasks, this, mDataBase);
     }
 
     @Override
@@ -154,7 +156,7 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
     @Override
     public void onDeleteTask(Task task) {
         tasks.remove(task);
-        mDataBase.taskDao().deleteTask(task.getId());
+        this.mMainViewModel.deleteTask(task.getId());
         updateTasks();
     }
 
@@ -225,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
      */
     private void addTask(@NonNull Task task) {
         tasks.add(task);
-        mDataBase.taskDao().insertTask(task);
+        this.mMainViewModel.createTask(task);
         updateTasks();
     }
 
@@ -254,7 +256,7 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
                     break;
 
             }
-            adapter.updateTasks(tasks);
+            adapter.updateTasks(tasks, projects);
         }
     }
 
@@ -288,51 +290,47 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
             public void onShow(DialogInterface dialogInterface) {
 
                 Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                button.setOnClickListener(new View.OnClickListener() {
-
-                    @Override
-                    public void onClick(View view) {
-                        onPositiveButtonClick(dialog);
-                    }
-                });
+                button.setOnClickListener(view -> onPositiveButtonClick(dialog));
             }
         });
 
         return dialog;
     }
 
-
     private void populateList() {
-        final Observer<List<Task>> taskObserver = new Observer<List<Task>>() {
-            @Override
-            public void onChanged(@Nullable final List<Task> tasksList) {
-                if (tasksList != null) {
-                    tasks = tasksList;
-                    updateTasks();
-                }
+        final Observer<List<Task>> taskObserver = tasksList -> {
+            if (tasksList != null) {
+                tasks = tasksList;
+                updateTasks();
             }
         };
-        mTaskDao.getTasks().observe(this, taskObserver);
+        this.mMainViewModel.getTasks().observe(this, taskObserver);
     }
 
+    private void projectObservers() {
+        final Observer<List<Project>> projectObserver = projectList -> {
+            if (projectList != null) {
+                projects = projectList;
+                updateTasks();
+            }
+        };
+        this.mMainViewModel.getProjects().observe(this, projectObserver);
+    }
 
     /**
      * Sets the data of the Spinner with projects to associate to a new task
      */
     private void populateDialogSpinner() {
-        final Observer<List<Project>> projectObserver = new Observer<List<Project>>() {
-            @Override
-            public void onChanged(@Nullable final List<Project> projectList) {
-                final ArrayAdapter<Project> adapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_spinner_item, projectList);
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        final ArrayAdapter<Project> adapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_spinner_item, projects);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        if (dialogSpinner != null) {
+            dialogSpinner.setAdapter(adapter);
+        }
+    }
 
-                if (dialogSpinner != null) {
-                    dialogSpinner.setAdapter(adapter);
-                }
-            }
-        };
-
-        mProjectDao.getProjects().observe(this, projectObserver);
+    private void configureViewModel() {
+        ViewModelFactory mViewModelFactory = Injection.provideViewModelFactory(this);
+        this.mMainViewModel = ViewModelProviders.of(this, mViewModelFactory).get(MainViewModel.class);
     }
 
     /**
