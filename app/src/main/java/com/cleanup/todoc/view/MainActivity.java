@@ -1,15 +1,18 @@
 package com.cleanup.todoc.view;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -272,26 +275,19 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
         alertBuilder.setTitle(R.string.add_task);
         alertBuilder.setView(R.layout.dialog_add_task);
         alertBuilder.setPositiveButton(R.string.add, null);
-        alertBuilder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialogInterface) {
-                dialogEditText = null;
-                dialogSpinner = null;
-                dialog = null;
-            }
+        alertBuilder.setOnDismissListener(dialogInterface -> {
+            dialogEditText = null;
+            dialogSpinner = null;
+            dialog = null;
         });
 
         dialog = alertBuilder.create();
 
         // This instead of listener to positive button in order to avoid automatic dismiss
-        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+        dialog.setOnShowListener(dialogInterface -> {
 
-            @Override
-            public void onShow(DialogInterface dialogInterface) {
-
-                Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                button.setOnClickListener(view -> onPositiveButtonClick(dialog));
-            }
+            Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            button.setOnClickListener(view -> onPositiveButtonClick(dialog));
         });
 
         return dialog;

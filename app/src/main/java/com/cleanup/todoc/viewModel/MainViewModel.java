@@ -1,7 +1,7 @@
 package com.cleanup.todoc.viewModel;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.ViewModel;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.ViewModel;
 
 import com.cleanup.todoc.model.Project;
 import com.cleanup.todoc.model.Task;
@@ -23,7 +23,7 @@ public class MainViewModel extends ViewModel {
     private final Executor executor;
 
 
-    public MainViewModel(TaskRepository taskDataSource, ProjectRepository projectDataSource, Executor executor) {
+    MainViewModel(TaskRepository taskDataSource, ProjectRepository projectDataSource, Executor executor) {
         this.taskDataSource = taskDataSource;
         this.projectDataSource = projectDataSource;
         this.executor = executor;
@@ -32,32 +32,14 @@ public class MainViewModel extends ViewModel {
     // -------------
     // FOR PROJECT
     // -------------
-    public Project getProject(long projectId) {
-        return projectDataSource.getProject(projectId);
-    }
 
     public LiveData<List<Project>> getProjects() {
         return projectDataSource.getProjects();
     }
 
-    public void createProject(final Project project) {
-        executor.execute(() -> projectDataSource.insertProject(project));
-    }
-
-    public void deleteProject(long projectId) {
-        executor.execute(() -> projectDataSource.deleteProject(projectId));
-    }
-
-    public void updateProject(Project project) {
-        executor.execute(() -> projectDataSource.updateProject(project));
-    }
-
     // -------------
     // FOR TASK
     // -------------
-    public Task getTask(long taskId) {
-        return taskDataSource.getTask(taskId);
-    }
 
     public LiveData<List<Task>> getTasks() {
         return taskDataSource.getTasks();
@@ -70,10 +52,4 @@ public class MainViewModel extends ViewModel {
     public void deleteTask(long taskId) {
         executor.execute(() -> taskDataSource.deleteTask(taskId));
     }
-
-    public void updateTask(Task task) {
-        executor.execute(() -> taskDataSource.updateTask(task));
-    }
-
-
 }

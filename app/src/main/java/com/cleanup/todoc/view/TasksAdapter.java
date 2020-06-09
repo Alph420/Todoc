@@ -1,10 +1,12 @@
 package com.cleanup.todoc.view;
 
 import android.content.res.ColorStateList;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.AppCompatImageView;
-import android.support.v7.widget.RecyclerView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatImageView;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,7 +56,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
      * Updates the list of tasks the adapter deals with.
      *
      * @param tasks    the list of tasks the adapter deals with to set
-     * @param projects
+     * @param projects the list of project
      */
     void updateTasks(@NonNull final List<Task> tasks, List<Project> projects) {
         this.tasks = tasks;
@@ -167,7 +169,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
         }
 
         @Nullable
-        public Project getProjectById(long id) {
+        Project getProjectById(long id) {
             for (Project project : projects) {
                 if (project.getId() == id)
                     return project;

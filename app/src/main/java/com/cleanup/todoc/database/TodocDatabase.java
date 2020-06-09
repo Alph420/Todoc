@@ -1,14 +1,16 @@
 package com.cleanup.todoc.database;
 
-import android.arch.persistence.db.SupportSQLiteDatabase;
-import android.arch.persistence.room.Database;
-import android.arch.persistence.room.OnConflictStrategy;
-import android.arch.persistence.room.Room;
-import android.arch.persistence.room.RoomDatabase;
+import androidx.sqlite.db.SupportSQLiteDatabase;
+import androidx.room.Database;
+import androidx.room.OnConflictStrategy;
+import androidx.room.Room;
+import androidx.room.RoomDatabase;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.graphics.Color;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
 
 import com.cleanup.todoc.database.dao.ProjectDao;
 import com.cleanup.todoc.database.dao.TaskDao;
@@ -39,7 +41,6 @@ public abstract class TodocDatabase extends RoomDatabase {
                     INSTANCE = Room.databaseBuilder(context,
                             TodocDatabase.class, "MyDatabase.db")
                             .addCallback(prepopulateDatabase())
-                            .allowMainThreadQueries()
                             .build();
                 }
             }
@@ -54,11 +55,10 @@ public abstract class TodocDatabase extends RoomDatabase {
             public void onCreate(@NonNull SupportSQLiteDatabase db) {
                 super.onCreate(db);
                 Random rnd = new Random();
-                int color1 = Color.argb(255, rnd.nextInt(256 - 0), rnd.nextInt(256 - 0), rnd.nextInt(256 - 0));
-                int color2 = Color.argb(255, rnd.nextInt(256 - 0), rnd.nextInt(256 - 0), rnd.nextInt(256 - 0));
-                int color3 = Color.argb(255, rnd.nextInt(256 - 0), rnd.nextInt(256 - 0), rnd.nextInt(256 - 0));
+                int color1 = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
+                int color2 = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
+                int color3 = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
 
-                //TODO prepeupler la bd
                 ContentValues projectTartampion = new ContentValues();
                 projectTartampion.put("id", 1);
                 projectTartampion.put("name", "Projet Tartampion");

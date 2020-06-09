@@ -1,25 +1,33 @@
 package com.cleanup.todoc;
 
-import android.arch.persistence.room.Room;
+import android.content.ContentValues;
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
+import android.graphics.Color;
+import android.os.Build;
+
+import androidx.annotation.NonNull;
+import androidx.room.OnConflictStrategy;
+import androidx.room.Room;
+import androidx.room.RoomDatabase;
+import androidx.sqlite.db.SupportSQLiteDatabase;
+import androidx.test.core.app.ApplicationProvider;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.cleanup.todoc.model.Task;
 import com.cleanup.todoc.database.TodocDatabase;
 import com.cleanup.todoc.database.dao.ProjectDao;
 import com.cleanup.todoc.database.dao.TaskDao;
-import com.cleanup.todoc.viewModel.MainViewModel;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -30,37 +38,82 @@ import static org.junit.Assert.assertSame;
  *
  * @author Gaëtan HERFRAY
  */
-@RunWith(RobolectricTestRunner.class)
+@RunWith(AndroidJUnit4.class)
+@Config(sdk = {Build.VERSION_CODES.O_MR1})
 public class TaskUnitTest {
-    TodocDatabase mDataBase;
-    ProjectDao mProjectDao;
-    TaskDao mTaskDao;
-    MainViewModel mMainViewModel;
+    private TodocDatabase mDataBase;
+    private ProjectDao mProjectDao;
+    private TaskDao mTaskDao;
 
     @Before
     public void createDb() {
-        Context context = InstrumentationRegistry.getTargetContext();
-        mDataBase = TodocDatabase.getInstance(context);
+        Context context = ApplicationProvider.getApplicationContext();
+        mDataBase = Room.inMemoryDatabaseBuilder(context, TodocDatabase.class)
+                .allowMainThreadQueries()
+                .addCallback(prepopulateDatabase())
+                .build();
+
         mProjectDao = mDataBase.projetDao();
         mTaskDao = mDataBase.taskDao();
+    }
+
+    @After
+    public void closeDb() {
+        mDataBase.close();
+    }
 
 
-         /*   ViewModelFactory mViewModelFactory = Injection.provideViewModelFactory(context);
-        this.mMainViewModel = ViewModelProviders.of(this,mViewModelFactory).get(MainViewModel.class); */
+    private static RoomDatabase.Callback prepopulateDatabase() {
+        return new RoomDatabase.Callback() {
+
+            @Override
+            public void onCreate(@NonNull SupportSQLiteDatabase db) {
+                super.onCreate(db);
+                Random rnd = new Random();
+                int color1 = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
+                int color2 = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
+                int color3 = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
+
+
+                ContentValues projectTartampion = new ContentValues();
+                projectTartampion.put("id", 1);
+                projectTartampion.put("name", "Projet Tartampion");
+                projectTartampion.put("color", color1);
+
+                ContentValues projectLucidia = new ContentValues();
+                projectLucidia.put("id", 2);
+                projectLucidia.put("name", "Projet Lucidia");
+                projectLucidia.put("color", color2);
+
+                ContentValues projectCircus = new ContentValues();
+                projectCircus.put("id", 3);
+                projectCircus.put("name", "Projet Circus");
+                projectCircus.put("color", color3);
+
+
+                db.insert("Project", OnConflictStrategy.IGNORE, projectTartampion);
+                db.insert("Project", OnConflictStrategy.IGNORE, projectLucidia);
+                db.insert("Project", OnConflictStrategy.IGNORE, projectCircus);
+            }
+        };
     }
 
 
     @Test
-    public void test_projects() {
-        final Task task1 = new Task(1, 1, "task 1", new Date().getTime());
-        final Task task2 = new Task(2, 2, "task 2", new Date().getTime());
-        final Task task3 = new Task(3, 3, "task 3", new Date().getTime());
-        final Task task4 = new Task(4, 4, "task 4", new Date().getTime());
 
-        assertEquals("Projet Tartampion", mDataBase.projetDao().getProject(task1.getProjectId()).getName());
-        assertEquals("Projet Lucidia", mDataBase.projetDao().getProject(task2.getProjectId()).getName());
-        assertEquals("Projet Circus", mDataBase.projetDao().getProject(task3.getProjectId()).getName());
-        assertNull(mDataBase.projetDao().getProject(task4.getProjectId()));
+    public void test_projects() {
+        final Task task1 = new Task(0, 1, "task 1", new Date().getTime());
+        final Task task2 = new Task(1, 2, "task 2", new Date().getTime());
+        final Task task3 = new Task(2, 3, "task 3", new Date().getTime());
+        final Task task4 = new Task(3, 4, "task 4", new Date().getTime());
+
+
+        assertEquals("Projet Tartampion", mProjectDao.getProject(task1.getProjectId()).getName());
+        assertEquals("Projet Lucidia", mProjectDao.getProject(task2.getProjectId()).getName());
+        assertEquals("Projet Circus", mProjectDao.getProject(task3.getProjectId()).getName());
+        assertNull(mProjectDao.getProject(task4.getProjectId()));
+
+
     }
 
     @Test
