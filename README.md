@@ -1,3 +1,3 @@
 # Todoc
 
-Application de gestion de taches d'une entreprise de nettoyage avec persistance des données via le sdk Room
+Task management application for a cleaning company with data persistence via the Room sdk
